@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Clipper sign-in</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+  <header><a class="brand" href="../">Clipper</a></header>
+  <h1 id="title">Almost done</h1>
+  <p class="muted" id="msg">Copy this page's full address and paste it into the terminal where the sign-in helper is waiting.</p>
+  <div class="box"><code id="url"></code></div>
+  <button id="copy" type="button">Copy address</button>
+  <p class="muted" id="done" hidden>Copied. Paste it into the terminal, then close this tab.</p>
+</main>
+<script>
+  // Shows the address (which carries the one-time sign-in code) so it can be copied.
+  // Nothing is sent anywhere; this page has no analytics and makes no requests.
+  var href = location.href;
+  document.getElementById("url").textContent = href;
+  var q = new URLSearchParams(location.search);
+  if (q.get("error")) {
+    document.getElementById("title").textContent = "Sign-in was cancelled";
+    document.getElementById("msg").textContent = "The platform reported: " + (q.get("error_description") || q.get("error")) + ". Run the sign-in helper again.";
+  } else if (!q.get("code")) {
+    document.getElementById("title").textContent = "Clipper sign-in page";
+    document.getElementById("msg").textContent = "This page is where TikTok and Instagram send you after you approve Clipper. There's nothing to do here right now.";
+    document.getElementById("copy").hidden = true;
+  }
+  document.getElementById("copy").addEventListener("click", function () {
+    navigator.clipboard.writeText(href).then(function () {
+      document.getElementById("done").hidden = false;
+    }, function () {
+      var r = document.createRange(); r.selectNodeContents(document.getElementById("url"));
+      var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    });
+  });
+</script>
+</body>
+</html>
